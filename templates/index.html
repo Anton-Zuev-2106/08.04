@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>PolyNews AI</title>
+
+<link rel="stylesheet"
+href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<header>
+
+<button
+class="theme-btn"
+onclick="toggleTheme()">
+🌙 / ☀️
+</button>
+
+<h1>📰 PolyNews AI</h1>
+
+<p>
+Новостной агрегатор с Machine Learning
+</p>
+
+</header>
+
+<div class="container">
+
+<div class="stats">
+
+<div class="stat">
+<h2>{{ total_news }}</h2>
+<p>Всего новостей</p>
+</div>
+
+<div class="stat">
+<h2>{{ sport }}</h2>
+<p>Спорт</p>
+</div>
+
+<div class="stat">
+<h2>{{ politics }}</h2>
+<p>Политика</p>
+</div>
+
+<div class="stat">
+<h2>{{ technology }}</h2>
+<p>Технологии</p>
+</div>
+
+<div class="stat">
+<h2>{{ gaming }}</h2>
+<p>Gaming</p>
+</div>
+
+</div>
+
+<div class="trending">
+
+<h2>🔥 Тренды дня</h2>
+
+<ul>
+
+{% for item in trending %}
+
+<li>{{ item[1] }}</li>
+
+{% endfor %}
+
+</ul>
+
+</div>
+
+<form class="search-box">
+
+<input
+id="searchInput"
+type="text"
+name="search"
+placeholder="Live Search..."
+value="{{ search }}"
+>
+
+<select name="category">
+
+<option value="">Все категории</option>
+
+<option value="sport">Спорт</option>
+
+<option value="politics">Политика</option>
+
+<option value="technology">Технологии</option>
+
+<option value="gaming">Gaming</option>
+
+</select>
+
+<button>
+Поиск
+</button>
+
+</form>
+
+<div id="newsContainer">
+
+{% for article in articles %}
+
+<div class="card">
+
+<div class="category">
+{{ article[6] if article[6] else "Без категории" }}
+</div>
+
+<h2>{{ article[1] }}</h2>
+
+<p>{{ article[3] }}</p>
+
+<p>
+Источник:
+<b>{{ article[4] }}</b>
+</p>
+
+<a
+href="{{ article[2] }}"
+target="_blank">
+
+Читать оригинал →
+
+</a>
+
+</div>
+
+{% endfor %}
+
+</div>
+
+</div>
+
+<script>
+
+function toggleTheme(){
+
+document.body.classList.toggle(
+"light"
+);
+
+localStorage.setItem(
+"theme",
+document.body.classList.contains("light")
+? "light"
+: "dark"
+);
+
+}
+
+if(
+localStorage.getItem("theme")
+==="light"
+){
+document.body.classList.add(
+"light"
+);
+}
+
+document
+.getElementById("searchInput")
+.addEventListener(
+"keyup",
+function(){
+
+let value=
+this.value.toLowerCase();
+
+let cards=
+document.querySelectorAll(".card");
+
+cards.forEach(card=>{
+
+if(
+card.innerText
+.toLowerCase()
+.includes(value)
+){
+card.style.display="block";
+}
+else{
+card.style.display="none";
+}
+
+});
+
+}
+);
+
+setInterval(function(){
+
+fetch("/api/news")
+.then(r=>r.json())
+.then(data=>{
+
+console.log(
+"Новости обновлены"
+);
+
+});
+
+},30000);
+
+</script>
+
+</body>
+</html>
